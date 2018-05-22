@@ -122,7 +122,7 @@ export default class PizzaTranslator extends Component {
 
 
 
-export default class GeolocationExample extends Component {
+class GeolocationExample extends Component {
   constructor(props) {
     super(props);
 
@@ -157,3 +157,60 @@ export default class GeolocationExample extends Component {
     );
   }
 }
+
+import GPSButton from './components/GPSButton/GPSButton.js';
+import LocationText from './components/LocationText/LocationText.js'
+
+class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      gps_latitude: null,
+      gps_longitude: null,
+      gps_error: null,
+    };
+
+    this.getPositionGPS = this.getPositionGPS.bind(this);
+
+  }
+
+
+  getPositionGPS(){
+    console.log("obteniendo posicion: .... inicio ");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          gps_latitude: position.coords.latitude,
+          gps_longitude: position.coords.longitude,
+          gps_error: null,
+        });
+      },
+      (error) => this.setState({ gps_error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+    console.log("obteniendo posicion: .... fin ");
+
+  }
+
+  render() {
+    return (
+     <View style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: 'powderblue', alignItems: 'center', justifyContent: 'center'}} > 
+            <LocationText latitude={this.state.gps_latitude} longitude={this.state.gps_longitude} gps_error={this.state.gps_error}  />    
+        </View>
+        <View style={{flex: 2}}> 
+            <GPSButton getPosition={this.getPositionGPS} />
+        </View>
+        <View style={{flex: 3, backgroundColor: 'steelblue'}} />
+      </View>
+
+    );
+  }
+
+
+}
+
+export default App;
