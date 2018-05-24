@@ -1,185 +1,33 @@
 import React, { Component } from 'react';
-import { AppRegistry, Button, Alert, Image, Text, TextInput, View, StyleSheet } from 'react-native';
-
-
-class Greeting extends Component {
-    render() {
-        return (
-            <Text style={styles.red}>Holaa {this.props.name}!</Text>
-        );
-    }
-}
-
-
-
-class Blink extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {isShowingText: true};
-
-    // Toggle the state every second
-    setInterval(() => {
-      this.setState(previousState => {
-        return { isShowingText: !previousState.isShowingText };
-      });
-    }, 1000);
-  }//constructor
-
-  render() {
-    let display = this.state.isShowingText ? this.props.text : ' ';
-    return (
-      <Text>{display}</Text>
-    );
-  }
-}
-
-
-const styles = StyleSheet.create({
-  bigblue: {
-    color: 'blue',
-    fontWeight: 'bold',
-    fontSize: 30,
-  },
-  red: {
-    color: 'red',
-  },
-});
-
-/*
-export default class HelloWorldApp extends Component {
-    render() {
-
-        let pic = {
-            uri: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Bananavarieties.jpg'
-        };
-
-        return (
-             <View style={{alignItems: 'center', flex: 1, flexDirection: 'row'}}>                
-                <Image source={pic} style={{width: 193, height: 110}}/>
-
-                <View style={{flex: 1, backgroundColor: 'powderblue'}} >
-                    <Greeting name='Rexxar' />
-                    <Greeting name='Jaina' />
-                    <Greeting name='Valeera' />
-                 </View>
-
-                <View style={{flex: 2, backgroundColor: 'powderblue'}} >
-                    <Blink text='Texto que aparece y desaparece' />
-                    <Blink text='Texto otro mas' />
-                    <Text style={styles.red}>just red</Text>
-                    <Text style={styles.bigblue}>just bigblue</Text>
-                    <Text style={[styles.bigblue, styles.red]}>bigblue, then red</Text>
-                    <Text style={[styles.red, styles.bigblue]}>red, then bigblue</Text>
-                 </View>
-
-                <View style={{flex: 3, backgroundColor: 'steelblue'}} >
-                    <View style={{width: 50, height: 50, backgroundColor: 'powderblue'}} />
-                    <View style={{width: 100, height: 100, backgroundColor: 'skyblue'}} />
-                    <View style={{width: 150, height: 150, backgroundColor: 'steelblue'}} />
-                 </View>
-
-             </View>
-        );
-    }
-}
-
-*/
-
-/*
-
-export default class PizzaTranslator extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {text: ''};
-  }
-
-  render() {
-    return (
-      <View style={{paddingTop: 80}}>
-        <TextInput
-          style={{height: 40}}
-          placeholder="Type here to translate!"
-          onChangeText={(text) => this.setState({text})}
-        />
-        <Text style={{padding: 10, fontSize: 42}}>
-          {this.state.text.split(' ').map((word) => word && '🍕').join('xxx')}
-        </Text>
-
-
-        <Button
-          onPress={() => {
-            Alert.alert('You tapped the button!');
-          }}
-          title="Press Me"
-        />
-
-      </View>
-    );
-  }
-}
-
-*/
-
-
-
-class GeolocationExample extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      latitude: null,
-      longitude: null,
-      error: null,
-    };
-  }
-
-  componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          error: null,
-        });
-      },
-      (error) => this.setState({ error: error.message }),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
-    );
-  }
-
-  render() {
-    return (
-      <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Latitude: {this.state.latitude}</Text>
-        <Text>Longitude: {this.state.longitude}</Text>
-        {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
-      </View>
-    );
-  }
-}
+import { AppRegistry, Button, Alert, Image, Text, TextInput, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Camera, Permissions } from 'expo';
 
 import GPSButton from './components/GPSButton/GPSButton.js';
-import LocationText from './components/LocationText/LocationText.js'
+import LocationText from './components/LocationText/LocationText.js';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       gps_latitude: null,
       gps_longitude: null,
       gps_error: null,
-    };
-
+      hasCameraPermission: null,
+      type: Camera.Constants.Type.back,
+    };//this.state
     this.getPositionGPS = this.getPositionGPS.bind(this);
+  }//constructor props
 
-  }
+ async componentWillMount() {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    this.setState({ hasCameraPermission: status === 'granted' });
+    console.log(status);
+  }//async componentwillmount
 
 
   getPositionGPS(){
     console.log("obteniendo posicion: .... inicio ");
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -192,25 +40,59 @@ class App extends Component {
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
     console.log("obteniendo posicion: .... fin ");
-
-  }
+  }//getPositionGPS
 
   render() {
-    return (
-     <View style={{flex: 1}}>
-        <View style={{flex: 1, backgroundColor: 'powderblue', alignItems: 'center', justifyContent: 'center'}} > 
-            <LocationText latitude={this.state.gps_latitude} longitude={this.state.gps_longitude} gps_error={this.state.gps_error}  />    
+    const { hasCameraPermission } = this.state;
+    if (hasCameraPermission === null) {
+        return (
+         <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: 'powderblue', alignItems: 'center', justifyContent: 'center'}} > 
+                <LocationText latitude={this.state.gps_latitude} longitude={this.state.gps_longitude} gps_error={this.state.gps_error}  />    
+            </View>
+            <View style={{flex: 2}}> 
+                <GPSButton getPosition={this.getPositionGPS} />
+            </View>
+            <View style={{flex: 3, backgroundColor: 'steelblue'}} />
+          </View>
+        );
+    }else if (hasCameraPermission === false) {
+      return <Text>No access to camera</Text>;
+    } else {
+      return (
+        <View style={{ flex: 1 }}>
+          <Camera style={{ flex: 1 }} type={this.state.type}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'transparent',
+                flexDirection: 'row',
+              }}>
+              <TouchableOpacity
+                style={{
+                  flex: 0.1,
+                  alignSelf: 'flex-end',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  this.setState({
+                    type: this.state.type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back,
+                  });
+                }}>
+                <Text
+                  style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
+                  {' '}Flip{' '}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Camera>
         </View>
-        <View style={{flex: 2}}> 
-            <GPSButton getPosition={this.getPositionGPS} />
-        </View>
-        <View style={{flex: 3, backgroundColor: 'steelblue'}} />
-      </View>
+      );
+    }//else
+ }//render
 
-    );
-  }
-
-
-}
+}//Component   
 
 export default App;
