@@ -60,6 +60,9 @@ class App extends Component {
   }//toogleCameraView
 
   render() {
+        const { hasCameraPermission } = this.state;
+        const { cameraEnabled } = this.state;
+        if (cameraEnabled === false) {
         return (
          <View style={{flex: 1}}>
             <View style={{flex: 1, backgroundColor: 'powderblue', alignItems: 'center', justifyContent: 'center'}} > 
@@ -73,6 +76,49 @@ class App extends Component {
             </View>
           </View>
         );
+      } else {
+
+
+
+        if (hasCameraPermission === null) {
+          return <View />;
+        } else if (hasCameraPermission === false) {
+          return <Text>No access to camera</Text>;
+        } else {
+          return (
+            <View style={{ flex: 1 }}>
+              <Camera style={{ flex: 1 }} type={this.state.type}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'transparent',
+                    flexDirection: 'row',
+                  }}>
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.1,
+                      alignSelf: 'flex-end',
+                      alignItems: 'center',
+                    }}
+                    onPress={() => {
+                      this.setState({
+                        cameraEnabled: false
+                      });
+                    }}>
+                    <Text
+                      style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
+                      {' '}Atras{' '}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </Camera>
+            </View>
+          );
+        }
+
+
+
+      } // else
   }//render
 
 }//Component   
