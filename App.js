@@ -74,11 +74,18 @@ class App extends Component {
         array_uri = data.uri.split("/");
         uri_nombre_corto = array_uri[array_uri.length - 1]
 
+
+        gps_latitude_float = parseFloat(this.state.gps_latitude);
+        gps_longitude_float = parseFloat(this.state.gps_longitude);
+
+
+
         const dataform = new FormData();
         dataform.append('name', uri_nombre_corto);
-        dataform.append('latitud', 0.25);
-        dataform.append('longitud', 0.25);
+        dataform.append('latitud',  gps_latitude_float);
+        dataform.append('longitud', gps_longitude_float);
 
+        console.log("lat y long ... correctos .....")
 
         dataform.append('photo_react', {
           uri: data.uri,
