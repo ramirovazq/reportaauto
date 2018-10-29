@@ -13,6 +13,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      // form input text
+      text: '',
       // GPS
       gps_latitude: null,
       gps_longitude: null,
@@ -47,6 +49,32 @@ class App extends Component {
           gps_longitude: position.coords.longitude,
           gps_error: null,
         });
+
+
+        gps_latitude_float = parseFloat(this.state.gps_latitude);
+        gps_longitude_float = parseFloat(this.state.gps_longitude);
+        const dataform = new FormData();
+        dataform.append('name', this.state.text);
+        dataform.append('latitud',  gps_latitude_float);
+        dataform.append('longitud', gps_longitude_float);
+
+        fetch('http://fletes.ramirovaz.webfactional.com/api/v0/restphoto/', {
+          method: 'post',
+          body: dataform
+        }).then(res => {
+          console.log('------------------resultado del POST SOLO COORDENADAS.... inicio');
+          console.log(res);
+          console.log('------------------resultado del POST SOLO COORDENADAS........fin');
+          console.log('------------------se borra el campo de texto........inicio');
+          this.setState({
+            text: ''
+          });
+          console.log('------------------se borra el campo de texto........fin');
+
+        }).catch(function(error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
+
       },
       (error) => this.setState({ gps_error: error.message }),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
@@ -141,9 +169,14 @@ class App extends Component {
         return (
          <View style={{flex: 1}}>
             <View style={{flex: 1, backgroundColor: 'powderblue', alignItems: 'center', justifyContent: 'center'}} > 
-                <LocationText latitude={this.state.gps_latitude} longitude={this.state.gps_longitude} gps_error={this.state.gps_error}  camera_enable={this.state.cameraEnabled} />    
-            </View>
+                <LocationText textoenviar={this.state.text} latitude={this.state.gps_latitude} longitude={this.state.gps_longitude} gps_error={this.state.gps_error}  camera_enable={this.state.cameraEnabled} />    
+            </View>            
             <View style={{flex: 2}}> 
+                <TextInput
+                  style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                  onChangeText={(text) => this.setState({text})}
+                  value={this.state.text}
+                />
                 <GPSButton getPosition={this.getPositionGPS} />
             </View>
             <View style={{flex: 3, backgroundColor: 'steelblue'}}>

@@ -7,6 +7,7 @@ export default class LocacionTexto extends Component {
   render() {
     return (
       <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Texto Enviar: {this.props.textoenviar}</Text>
         <Text>Latitude: {this.props.latitude}</Text>
         <Text>Longitude: {this.props.longitude}</Text>
         {this.props.camera_enable ? <Text>Camera si :D</Text> : <Text>Camera NO :(</Text>}
